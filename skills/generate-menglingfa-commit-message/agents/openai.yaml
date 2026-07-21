@@ -1,0 +1,4 @@
+interface:
+  display_name: "Menglingfa Commit Message"
+  short_description: "按 menglingfa 风格根据当前 diff 生成提交说明"
+  default_prompt: "使用 $generate-menglingfa-commit-message 检查当前 diff，并按 menglingfa 的提交风格生成中文 commit message。"
