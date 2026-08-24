@@ -1,0 +1,4 @@
+interface:
+  display_name: "日报周报月报生成"
+  short_description: "生成日报、周报、月报并保存为 Markdown 文件"
+  default_prompt: "使用 $report-generator 生成所需的日报、周报或月报，并同步保存到 C:\\00work\\文档 对应目录。"
