@@ -1,0 +1,3 @@
+interface:
+  display_name: "EZQuery 登录恢复"
+  short_description: "恢复双设备认证或回调失败的 EZQuery 登录"
