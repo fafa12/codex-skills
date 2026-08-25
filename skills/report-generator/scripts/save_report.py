@@ -13,6 +13,17 @@ from pathlib import Path
 TYPE_DIRS = {"daily": "日报", "weekly": "周报", "monthly": "月报"}
 
 
+def format_date_range(start: dt.date, end: dt.date) -> str:
+    """Format a weekly filename stem using its Monday-Sunday date range."""
+    return f"{start.year}年{start.month}月{start.day}号-{end.year}年{end.month}月{end.day}号"
+
+
+def weekly_stem(date_value: dt.date) -> str:
+    """Return the canonical filename stem for the ISO week containing date_value."""
+    start = date_value - dt.timedelta(days=date_value.weekday())
+    return format_date_range(start, start + dt.timedelta(days=6))
+
+
 def parse_period(report_type: str, value: str | None) -> tuple[str, str]:
     """Return the canonical filename stem and a human-readable period."""
     if not value:
@@ -20,8 +31,7 @@ def parse_period(report_type: str, value: str | None) -> tuple[str, str]:
         if report_type == "daily":
             return today.isoformat(), today.isoformat()
         if report_type == "weekly":
-            iso = today.isocalendar()
-            stem = f"{iso.year}-W{iso.week:02d}"
+            stem = weekly_stem(today)
             return stem, stem
         return today.strftime("%Y-%m"), today.strftime("%Y-%m")
 
@@ -36,16 +46,16 @@ def parse_period(report_type: str, value: str | None) -> tuple[str, str]:
         if re.fullmatch(r"\d{4}-W\d{2}", value, re.IGNORECASE):
             year, week = value[:4], int(value[6:])
             try:
-                dt.date.fromisocalendar(int(year), week, 1)
+                monday = dt.date.fromisocalendar(int(year), week, 1)
             except ValueError as exc:
                 raise ValueError("周报 ISO 周不是该年份的有效周") from exc
-            return f"{year}-W{week:02d}", f"{year}-W{week:02d}"
+            stem = format_date_range(monday, monday + dt.timedelta(days=6))
+            return stem, stem
         try:
             date_value = dt.date.fromisoformat(value)
         except ValueError as exc:
             raise ValueError("周报周期必须是 YYYY-Www 或 YYYY-MM-DD") from exc
-        iso = date_value.isocalendar()
-        stem = f"{iso.year}-W{iso.week:02d}"
+        stem = weekly_stem(date_value)
         return stem, stem
 
     if re.fullmatch(r"\d{4}-\d{2}", value):
